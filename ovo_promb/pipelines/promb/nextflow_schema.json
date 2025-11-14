@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
+  "title": "Promb protein humanness evaluation",
+  "description": "",
+  "type": "object",
+  "required": ["input_pdb", "chains", "db", "peptide_length"],
+  "properties": {
+    "input_pdb": {
+      "type": "string",
+      "description": "Input PDB file, directory with PDB files, or text file with list of PDB file paths"
+    },
+    "chains": {
+      "type": "string",
+      "description": "Chains to evaluate, e.g. A,B"
+    },
+    "db": {
+      "type": "string",
+      "description": "Promb database name or path"
+    },
+    "peptide_length": {
+      "type": "integer",
+      "description": "Length of overlapping k-mer peptides to evaluate, 9-15 recommended"
+    },
+    "batch_size": {
+      "type": "integer",
+      "default": 100
+    },
+    "publish_dir": {
+      "type": "string"
+    },
+    "conda": {
+      "type": "boolean"
+    },
+    "docker_repository": {
+      "type": "string"
+    }
+  }
+}

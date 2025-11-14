@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ovo_promb"
+version = "0.0.1"
+description = "OVO plugin for promb humanness evaluation library"
+authors = [
+  { name="David Prihoda", email="david.prihoda@msd.com" }
+]
+# Dependencies for the app (NOT for the pipeline - these should be defined in ./your_module/pipeline/containers)
+dependencies = [
+  "streamlit",
+]
+
+[project.entry-points."ovo.plugins"]
+plugin = "ovo_promb:plugin"
