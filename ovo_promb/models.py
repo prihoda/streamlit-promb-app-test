@@ -20,7 +20,10 @@ class PrombDescriptorWorkflow(DescriptorWorkflow):
         metadata=dict(tool_name="Promb")
     )
 
-    def submit(self, scheduler: Scheduler, pipeline_name: str = None) -> str:
+    def get_pipeline_name(self) -> str:
+        return "ovo_promb.promb"
+
+    def prepare_params(self, workdir: str) -> dict:
         from ovo import db, storage
         # Collect pdb paths and ids in the same order (db.select does not guarantee same order)
         storage_paths = []
@@ -31,18 +34,14 @@ class PrombDescriptorWorkflow(DescriptorWorkflow):
             storage_paths.append(design.structure_path)
             design_ids.append(design.id)
         # Prepare a txt file with workflow input paths, each file renamed to design_id.pdb
-        input_path = storage.prepare_workflow_inputs(storage_paths, scheduler.workdir, names=design_ids)
+        input_path = storage.prepare_workflow_inputs(storage_paths, workdir, names=design_ids)
         # Submit job
-        job_id = scheduler.submit(
-            pipeline_name=pipeline_name or "ovo_promb.promb",
-            params={
-                "input_pdb": input_path,
-                "chains": ",".join(self.chains),
-                "db": self.promb_params.db,
-                "peptide_length": self.promb_params.peptide_length,
-            }
-        )
-        return job_id
+        return {
+            "input_pdb": input_path,
+            "chains": ",".join(self.chains),
+            "db": self.promb_params.db,
+            "peptide_length": self.promb_params.peptide_length,
+        }
 
     def process_results(self, job: "DescriptorJob", callback: Callable = None):
         """Process results of a successful workflow - download files from workdir, save DesignJob, Pool and Designs"""
