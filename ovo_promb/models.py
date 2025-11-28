@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Callable
 
-from ovo import DescriptorWorkflow, WorkflowTypes, Design, DescriptorJob, WorkflowParams
+from ovo.core.database import DescriptorWorkflow, WorkflowTypes, Design, DescriptorJob, WorkflowParams, Base
 from ovo.core.scheduler import Scheduler
 
 
@@ -43,9 +43,8 @@ class PrombDescriptorWorkflow(DescriptorWorkflow):
             "peptide_length": self.promb_params.peptide_length,
         }
 
-    def process_results(self, job: "DescriptorJob", callback: Callable = None):
+    def process_results(self, job: "DescriptorJob", callback: Callable = None) -> list[Base]:
         """Process results of a successful workflow - download files from workdir, save DesignJob, Pool and Designs"""
-        from ovo import db
         from ovo.core.logic.descriptor_logic import read_descriptor_file_values
 
         descriptor_values = read_descriptor_file_values(
@@ -55,4 +54,4 @@ class PrombDescriptorWorkflow(DescriptorWorkflow):
             # mapping from design.id to ID column in produced file
             design_id_mapping={design_id: design_id + ".pdb" for design_id in self.design_ids},
         )
-        db.save_all(descriptor_values + [job])
+        return descriptor_values + [job]
