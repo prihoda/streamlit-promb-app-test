@@ -1,8 +1,9 @@
 from io import StringIO
+from typing import Optional
 
 from ovo import db, schedulers, Pool, Design, DescriptorValue, DescriptorJob
 from ovo.app.components.descriptor_job_components import refresh_descriptors
-from ovo.app.utils.cached_db import get_cached_descriptor_values, get_cached_pools
+from ovo.app.utils.cached_db import get_cached_descriptor_values, get_cached_pools, get_cached_design_ids
 from ovo.core.logic.descriptor_logic import submit_descriptor_workflow
 import streamlit as st
 
@@ -13,21 +14,11 @@ from plotly import express as px
 
 
 @st.fragment
-def promb_fragment(pool_ids: list[str], design_ids: list[str] | None = None):
-    # TODO this should be cached
-    pools = get_cached_pools(pool_ids)
-
-    # TODO this is just because of our DB model - DescriptorJob being associated to a single Round
-    #  so we need to create a separate Workflow and DescriptorJob for each round
-    accepted_design_ids_by_round = {}
-    for round_id in sorted(set(pool.round_id for pool in pools)):
-        round_pool_ids = [pool.id for pool in pools if pool.round_id == round_id]
-        accepted_design_ids_by_round[round_id] = db.select_values(Design, 'id', pool_id__in=round_pool_ids, accepted=True)
+def promb_fragment(pool_ids: list[str], design_ids: Optional[list[str]] = None):
 
     if design_ids is None:
         # design_ids not explicitly passed, use all accepted designs in the selected pools
-        design_ids = [design_id for round_design_ids in accepted_design_ids_by_round.values() for design_id in round_design_ids]
-
+        design_ids = get_cached_design_ids(pool_ids=pool_ids, accepted=True)
         if not design_ids:
             st.write("No accepted designs in the selected " + ("pools" if len(pool_ids) > 1 else "pool") +
                      ". Please mark some designs as accepted in the **Jobs** page.")
@@ -44,10 +35,9 @@ def promb_fragment(pool_ids: list[str], design_ids: list[str] | None = None):
                  type='primary',
                  key='submit_btn',
                  help='Submit workflow for all designs',):
-        promb_submit_dialog(accepted_design_ids_by_round)
+        promb_submit_dialog(design_ids=design_ids)
 
     refresh_descriptors(
-        round_ids=set(pool.round_id for pool in pools),
         design_ids=design_ids,
         workflow_names=[PrombDescriptorWorkflow.name]
     )
@@ -82,7 +72,7 @@ def promb_fragment(pool_ids: list[str], design_ids: list[str] | None = None):
 
     st.dataframe(
         average_mutation_values.sort_values().rename(descriptor.name),
-        use_container_width=False,
+        width="content",
     )
 
     st.write("Values can be visualized and exported in the Explorer view.")
@@ -149,7 +139,7 @@ def design_visualization_fragment(design_ids: list[str]):
 
 @st.fragment
 @st.dialog("Promb submission", width="large")
-def promb_submit_dialog(accepted_design_ids_by_round: dict[str, list[str]]):
+def promb_submit_dialog(design_ids: list[str]):
     content = st.empty()
     with content.container():
         chains = st.text_input(
@@ -173,21 +163,20 @@ def promb_submit_dialog(accepted_design_ids_by_round: dict[str, list[str]]):
                 "Submit",
                 key="confirm_btn",
                 type="primary",
-                use_container_width=True,
+                width="stretch",
             )
 
     if submit:
         content.empty()
         st.write(f"Submitting job... 🚀")
-        for round_id, round_design_ids in accepted_design_ids_by_round.items():
-            workflow = PrombDescriptorWorkflow(
-                chains=list(chains),
-                design_ids=round_design_ids,
-                promb_params=PrombParams(
-                    db=db,
-                    peptide_length=peptide_length,
-                ),
-            )
-            submit_descriptor_workflow(workflow, scheduler_key, round_id)
+        workflow = PrombDescriptorWorkflow(
+            chains=list(chains),
+            design_ids=design_ids,
+            promb_params=PrombParams(
+                db=db,
+                peptide_length=peptide_length,
+            ),
+        )
+        submit_descriptor_workflow(workflow, scheduler_key, st.session_state.project.id)
         st.rerun()
 
