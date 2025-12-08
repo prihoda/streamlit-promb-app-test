@@ -1,0 +1,14 @@
+# Include only specific file types
+recursive-include ovo_* *
+prune ovo_*/pipelines/*/local
+
+prune **/test-results
+
+# Patterns to exclude from any directory
+global-exclude *~
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .git
+global-exclude .DS_Store
+global-exclude .ipynb_checkpoints
+global-exclude *.map

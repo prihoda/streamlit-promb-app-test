@@ -3,16 +3,26 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ovo_promb"
-version = "0.0.1"
+name = "ovo-promb"
+version = "0.0.2"
 description = "OVO plugin for promb humanness evaluation library"
 authors = [
   { name="David Prihoda", email="david.prihoda@msd.com" }
 ]
-# Dependencies for the app (NOT for the pipeline - these should be defined in ./your_module/pipeline/containers)
+# Dependencies for the app (NOT for the pipeline - these should be defined in your Nextflow pipeline)
 dependencies = [
   "streamlit",
 ]
 
 [project.entry-points."ovo.plugins"]
 plugin = "ovo_promb:plugin"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["ovo*"]
+
+[tool.setuptools.package-data]
+"*" = ["*"]
+

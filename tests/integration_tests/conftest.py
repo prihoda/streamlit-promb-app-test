@@ -36,7 +36,6 @@ def project_data():
         db.DescriptorValue.remove(design_id__in=[d.id for d in designs])
         db.Design.remove(pool_id__in=[p.id for p in pools])
         db.DesignJob.remove(id__in=[p.design_job_id for p in pools if p.design_job_id])
-        db.DescriptorJob.remove(round_id=project_round.id)
         db.Pool.remove(round_id=project_round.id)
         db.Round.remove(id=project_round.id)
 
