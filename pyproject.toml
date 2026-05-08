@@ -9,6 +9,7 @@ description = "OVO plugin for promb humanness evaluation library"
 authors = [
   { name="David Prihoda", email="david.prihoda@msd.com" }
 ]
+requires-python = ">=3.10"
 # Dependencies for the app (NOT for the pipeline - these should be defined in your Nextflow pipeline)
 dependencies = [
   "ovo",
