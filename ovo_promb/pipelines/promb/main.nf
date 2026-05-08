@@ -40,7 +40,7 @@ process runPromb {
   label "promb"
   // default compute resources
   cpus 1
-  memory "8 GB"
+  memory { params.max_memory ?: "8 GB"}
   // GPU
   // accelerator 1, type: "nvidia-tesla-t4"
 
