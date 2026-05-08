@@ -15,6 +15,9 @@ if is_streamlit_cloud:
             # Initialize OVO home dir
             subprocess.run(["ovo", "init", "home", TEMP_HOME_DR, "-y", "--no-env"])
             assert os.path.exists(os.path.join(TEMP_HOME_DR, "config.yml")), "OVO init home failed"
+            # TODO send max memory through ovo init command
+            subprocess.run(["sed", "-i", "s/max_memory: 8GB/max_memory: 3GB/", f"{TEMP_HOME_DR}/config.yml"])
+    os.environ["OVO_HOME"] = TEMP_HOME_DIR
 
 # TODO put this directly to init_nextflow?
 if is_streamlit_cloud:
@@ -27,7 +30,6 @@ if is_streamlit_cloud:
             subprocess.run(["curl", "-L", "-o", "/tmp/miniforge.sh", "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"])
             subprocess.run(["bash", "/tmp/miniforge.sh", "-b", "-p", TEMP_CONDA_DIR])
             subprocess.run(["conda", "install", "-c", "conda-forge", "-y", "procps-ng", "openjdk"])
-    os.environ["OVO_HOME"] = TEMP_HOME_DR
 
 
 st.subheader("Run shell command")
