@@ -8,16 +8,17 @@ st.set_page_config(layout="wide", page_title="promb", page_icon="🔥")
 is_streamlit_cloud = os.environ.get("HOSTNAME") == "streamlit"
 
 # TODO create function for this in ovo
+import uuid
 if is_streamlit_cloud:
-    TEMP_HOME_DIR = "/tmp/ovo"
-    if not os.path.exists(TEMP_HOME_DIR):
+    if "ovo_home" not in st.session_state:
+        st.session_state.ovo_home = "/tmp/ovo-" + uuid.uuid4().hex
         with st.spinner("Initializing OVO..."):
             # Initialize OVO home dir
-            subprocess.run(["ovo", "init", "home", TEMP_HOME_DIR, "-y", "--no-env"])
-            assert os.path.exists(os.path.join(TEMP_HOME_DIR, "config.yml")), "OVO init home failed"
+            subprocess.run(["ovo", "init", "home", st.session_state.ovo_home, "-y", "--no-env"])
+            assert os.path.exists(os.path.join(st.session_state.ovo_home, "config.yml")), "OVO init home failed"
             # TODO send max memory through ovo init command
-            subprocess.run(["sed", "-i", "s/max_memory: 8GB/max_memory: 3GB/", f"{TEMP_HOME_DIR}/config.yml"])
-    os.environ["OVO_HOME"] = TEMP_HOME_DIR
+            subprocess.run(["sed", "-i", "s/max_memory: 8GB/max_memory: 3GB/", f"{st.session_state.ovo_home}/config.yml"])
+    os.environ["OVO_HOME"] = st.session_state.ovo_home
 
 # TODO put this directly to init_nextflow?
 if is_streamlit_cloud:
