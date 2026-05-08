@@ -21,7 +21,7 @@ if is_streamlit_cloud:
                 os.makedirs(TEMP_JDK_DIR, exist_ok=True)
                 subprocess.run(["tar", "-xzf", "/tmp/openjdk.tar.gz", "-C", TEMP_JDK_DIR, "--strip-components=1"])
 
-    os.environ["PATH"] = TEMP_JDK_DIR + ":" + os.environ["PATH"]
+    os.environ["PATH"] = os.path.join(TEMP_JDK_DIR, "bin") + ":" + os.environ["PATH"]
     os.environ["OVO_HOME"] = TEMP_HOME_DR
 
 st.subheader("Run shell command")
