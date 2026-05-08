@@ -18,6 +18,7 @@ if is_streamlit_cloud:
             if is_streamlit_cloud:
                 subprocess.run(["curl", "-L", "-o", "/tmp/openjdk.tar.gz",
                                 "https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz"])
+                os.makedirs(TEMP_JDK_DIR, exist_ok=True)
                 subprocess.run(["tar", "-xzf", "/tmp/openjdk.tar.gz", "-C", TEMP_JDK_DIR, "--strip-components=1"])
 
     os.environ["PATH"] = TEMP_JDK_DIR + ":" + os.environ["PATH"]
