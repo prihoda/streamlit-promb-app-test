@@ -1,13 +1,6 @@
-# OVO plugin for promb: protein humanness evaluation
-
-More about promb: https://github.com/MSDLLCpapers/promb
-
-
-## HuggingFace Space
-
 ---
-title: Test
-emoji: 🚀
+title: Promb
+emoji: 🧍‍
 colorFrom: red
 colorTo: red
 sdk: docker
@@ -18,4 +11,9 @@ pinned: false
 short_description: Test
 license: mit
 ---
+
+# OVO plugin for promb: protein humanness evaluation
+
+More about promb: https://github.com/MSDLLCpapers/promb
+
 
