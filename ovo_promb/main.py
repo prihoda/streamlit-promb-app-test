@@ -14,6 +14,21 @@ if not os.path.exists(TEST_HOME_DIR):
 
 os.environ["OVO_HOME"] = TEST_HOME_DIR
 
+st.subheader("Run shell command")
+with st.form(key="run_command", border=False):
+    shell_command = st.text_area("Enter command:", placeholder="ls -la", key="shell_command", height=80)
+    if st.form_submit_button("Run"):
+        with st.spinner("Running command..."):
+            result = subprocess.run(
+                shell_command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                shell=True,
+            )
+        st.write("Finished with output:" if result.returncode == 0 else "Finished with error:")
+        st.code(result.stdout)
+
 from ovo import db
 from ovo.core.utils.tests import create_test_project_data
 from ovo_promb.design_views import promb_fragment
