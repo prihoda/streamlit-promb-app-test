@@ -6,10 +6,11 @@ import shutil
 st.set_page_config(layout="wide", page_title="promb", page_icon="🔥")
 
 is_streamlit_cloud = os.environ.get("HOSTNAME") == "streamlit"
+is_docker_demo = bool(int(os.environ.get("OVO_DOCKER_DEMO", 0)))
 
 # TODO create function for this in ovo
 import uuid
-if is_streamlit_cloud:
+if is_streamlit_cloud or is_docker_demo:
     if "ovo_home" not in st.session_state:
         st.session_state.ovo_home = "/tmp/ovo-" + uuid.uuid4().hex
         with st.spinner("Initializing OVO..."):
@@ -33,20 +34,20 @@ if is_streamlit_cloud:
             subprocess.run(["conda", "install", "-c", "conda-forge", "-y", "procps-ng", "openjdk"])
 
 
-# st.subheader("Run shell command")
-# with st.form(key="run_command", border=False):
-#     shell_command = st.text_area("Enter command:", placeholder="ls -la", key="shell_command", height=80)
-#     if st.form_submit_button("Run"):
-#         with st.spinner("Running command..."):
-#             result = subprocess.run(
-#                 shell_command,
-#                 stdout=subprocess.PIPE,
-#                 stderr=subprocess.STDOUT,
-#                 text=True,
-#                 shell=True,
-#             )
-#         st.write("Finished with output:" if result.returncode == 0 else "Finished with error:")
-#         st.code(result.stdout)
+st.subheader("Run shell command")
+with st.form(key="run_command", border=False):
+    shell_command = st.text_area("Enter command:", placeholder="ls -la", key="shell_command", height=80)
+    if st.form_submit_button("Run"):
+        with st.spinner("Running command..."):
+            result = subprocess.run(
+                shell_command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                shell=True,
+            )
+        st.write("Finished with output:" if result.returncode == 0 else "Finished with error:")
+        st.code(result.stdout)
 
 from ovo import db
 from ovo.core.utils.tests import create_test_project_data

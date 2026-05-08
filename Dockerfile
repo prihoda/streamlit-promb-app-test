@@ -20,6 +20,9 @@ RUN pip3 install .
 
 EXPOSE 8501
 
+ENV OVO_DOCKER_DEMO 1
+ENV STREAMLIT_SERVER_ENABLE_STATIC_SERVING true
+
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 ENTRYPOINT ["streamlit", "run", "ovo_promb/demo.py", "--server.port=8501", "--server.address=0.0.0.0"]
