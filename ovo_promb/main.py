@@ -1,9 +1,22 @@
+import shutil
+import os
 import streamlit as st
+import subprocess
+
+st.set_page_config(layout="wide", page_title="promb", page_icon="🔥")
+
+TEST_HOME_DIR = "/tmp/ovo"
+if not os.path.exists(TEST_HOME_DIR):
+    with st.spinner("Initializing OVO..."):
+        # Initialize OVO config.yml in test-results directory
+        subprocess.run(["ovo", "init", "home", TEST_HOME_DIR, "-y", "--no-env"])
+        assert os.path.exists(os.path.join(TEST_HOME_DIR, "config.yml")), "OVO init home failed"
+
+os.environ["OVO_HOME"] = TEST_HOME_DIR
+
 from ovo import db
 from ovo.core.utils.tests import create_test_project_data
 from ovo_promb.design_views import promb_fragment
-
-st.set_page_config(layout="wide", page_title="promb", page_icon="🔥")
 
 # FIXME: from ovo.app.utils.page_init import initialize_session
 # initialize_session()
