@@ -1,4 +1,3 @@
-import shutil
 import os
 import streamlit as st
 import subprocess
@@ -7,22 +6,22 @@ st.set_page_config(layout="wide", page_title="promb", page_icon="🔥")
 
 is_streamlit_cloud = os.environ.get("HOSTNAME") == "streamlit"
 
-TEST_HOME_DIR = "/tmp/ovo"
-if not os.path.exists(TEST_HOME_DIR):
-    with st.spinner("Initializing OVO..."):
-        # Initialize OVO config.yml in test-results directory
-        subprocess.run(["ovo", "init", "home", TEST_HOME_DIR, "-y", "--no-env"])
-        assert os.path.exists(os.path.join(TEST_HOME_DIR, "config.yml")), "OVO init home failed"
-
-        if is_streamlit_cloud:
-            subprocess.run(["curl", "-L", "-o", "/tmp/openjdk.tar.gz",
-                            "https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz"])
-            subprocess.run(["tar", "-xzf", "-C", "/tmp", "/tmp/openjdk.tar.gz"])
-
 if is_streamlit_cloud:
-    os.environ["PATH"] = "/tmp/jdk-21:" + os.environ["PATH"]
+    TEMP_HOME_DR = "/tmp/ovo"
+    TEMP_JDK_DIR = "/tmp/jdk"
+    if not os.path.exists(TEMP_HOME_DR):
+        with st.spinner("Initializing OVO..."):
+            # Initialize OVO config.yml in test-results directory
+            subprocess.run(["ovo", "init", "home", TEMP_HOME_DR, "-y", "--no-env"])
+            assert os.path.exists(os.path.join(TEMP_HOME_DR, "config.yml")), "OVO init home failed"
 
-os.environ["OVO_HOME"] = TEST_HOME_DIR
+            if is_streamlit_cloud:
+                subprocess.run(["curl", "-L", "-o", "/tmp/openjdk.tar.gz",
+                                "https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz"])
+                subprocess.run(["tar", "-xzf", "/tmp/openjdk.tar.gz", "-C", TEMP_JDK_DIR, "--strip-components=1"])
+
+    os.environ["PATH"] = TEMP_JDK_DIR + ":" + os.environ["PATH"]
+    os.environ["OVO_HOME"] = TEMP_HOME_DR
 
 # st.subheader("Run shell command")
 # with st.form(key="run_command", border=False):
