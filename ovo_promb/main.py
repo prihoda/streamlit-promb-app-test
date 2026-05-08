@@ -9,14 +9,14 @@ is_streamlit_cloud = os.environ.get("HOSTNAME") == "streamlit"
 
 # TODO create function for this in ovo
 if is_streamlit_cloud:
-    TEMP_HOME_DR = "/tmp/ovo"
-    if not os.path.exists(TEMP_HOME_DR):
+    TEMP_HOME_DIR = "/tmp/ovo"
+    if not os.path.exists(TEMP_HOME_DIR):
         with st.spinner("Initializing OVO..."):
             # Initialize OVO home dir
-            subprocess.run(["ovo", "init", "home", TEMP_HOME_DR, "-y", "--no-env"])
-            assert os.path.exists(os.path.join(TEMP_HOME_DR, "config.yml")), "OVO init home failed"
+            subprocess.run(["ovo", "init", "home", TEMP_HOME_DIR, "-y", "--no-env"])
+            assert os.path.exists(os.path.join(TEMP_HOME_DIR, "config.yml")), "OVO init home failed"
             # TODO send max memory through ovo init command
-            subprocess.run(["sed", "-i", "s/max_memory: 8GB/max_memory: 3GB/", f"{TEMP_HOME_DR}/config.yml"])
+            subprocess.run(["sed", "-i", "s/max_memory: 8GB/max_memory: 3GB/", f"{TEMP_HOME_DIR}/config.yml"])
     os.environ["OVO_HOME"] = TEMP_HOME_DIR
 
 # TODO put this directly to init_nextflow?
