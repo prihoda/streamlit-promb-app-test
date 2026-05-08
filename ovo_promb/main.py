@@ -6,23 +6,28 @@ st.set_page_config(layout="wide", page_title="promb", page_icon="🔥")
 
 is_streamlit_cloud = os.environ.get("HOSTNAME") == "streamlit"
 
+# TODO create function for this in ovo
 if is_streamlit_cloud:
     TEMP_HOME_DR = "/tmp/ovo"
-    TEMP_JDK_DIR = "/tmp/jdk"
     if not os.path.exists(TEMP_HOME_DR):
         with st.spinner("Initializing OVO..."):
-            # Initialize OVO config.yml in test-results directory
+            # Initialize OVO home dir
             subprocess.run(["ovo", "init", "home", TEMP_HOME_DR, "-y", "--no-env"])
             assert os.path.exists(os.path.join(TEMP_HOME_DR, "config.yml")), "OVO init home failed"
 
-            if is_streamlit_cloud:
-                subprocess.run(["curl", "-L", "-o", "/tmp/openjdk.tar.gz",
-                                "https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz"])
-                os.makedirs(TEMP_JDK_DIR, exist_ok=True)
-                subprocess.run(["tar", "-xzf", "/tmp/openjdk.tar.gz", "-C", TEMP_JDK_DIR, "--strip-components=1"])
-
-    os.environ["PATH"] = os.path.join(TEMP_JDK_DIR, "bin") + ":" + os.environ["PATH"]
+# TODO put this directly to init_nextflow?
+if is_streamlit_cloud:
+    TEMP_JDK_DIR = "/tmp/jdk"
+    TEMP_CONDA_DIR = "/tmp/conda"
+    os.environ["PATH"] = os.path.join(TEMP_CONDA_DIR, "bin") + ":" + os.environ["PATH"]
+    if not shutil.which("conda"):
+        with st.spinner("Installing dependencies..."):
+            # Install conda
+            subprocess.run(["curl", "-L", "-o", "/tmp/miniforge.sh", "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"])
+            subprocess.run(["bash", "/tmp/miniforge.sh", "-b", "-p", TEMP_CONDA_DIR])
+            subprocess.run(["conda", "install", "-c", "conda-forge", "-y", "procps-ng", "openjdk"])
     os.environ["OVO_HOME"] = TEMP_HOME_DR
+
 
 st.subheader("Run shell command")
 with st.form(key="run_command", border=False):
